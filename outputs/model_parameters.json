@@ -1,0 +1,203 @@
+{
+  "logistic_regression": {
+    "model_key": "logistic_regression",
+    "model_name": "Logistic Regression",
+    "model_type": "Generalized Linear Classifier",
+    "description": "Baseline linear statistical classifier with sigmoid link function and L2 regularization.",
+    "parameters": {
+      "C": {
+        "value": 2.4401,
+        "display_name": "Inverse Regularization Strength (C)",
+        "control_type": "Complexity Penalty",
+        "type": "float",
+        "meaning": "Specifies the inverse of regularization strength (1 / \u03bb). Smaller values impose stronger L2 penalization, heavily shrinking regression coefficients toward zero.",
+        "purpose": "Prevents overfitting on collinear geospatial and geomorphic factors (e.g., high correlation between elevation, slope, and terrain ruggedness) by dampening uninformative weights."
+      },
+      "max_iter": {
+        "value": 1000,
+        "display_name": "Maximum Iterations",
+        "control_type": "Convergence Boundary",
+        "type": "integer",
+        "meaning": "Maximum number of optimization gradient steps allowed before terminating search.",
+        "purpose": "Guarantees full mathematical convergence on dense feature surfaces without premature stopping."
+      },
+      "solver": {
+        "value": "lbfgs",
+        "display_name": "Numerical Solver Algorithm",
+        "control_type": "Loss Optimization",
+        "type": "string",
+        "meaning": "Optimization routine used to minimize cross-entropy loss (e.g., L-BFGS: Limited-memory Broyden-Fletcher-Goldfarb-Shanno quasi-Newton algorithm).",
+        "purpose": "Provides rapid, numerically stable convergence on large multidimensional raster datasets containing continuous topographic indices."
+      },
+      "class_weight": {
+        "value": "balanced",
+        "display_name": "Class Weighting",
+        "control_type": "Cost-Sensitive Balancing",
+        "type": "string",
+        "meaning": "Strategy to weight loss penalties inversely proportional to class frequencies across training samples.",
+        "purpose": "Heavily penalizes false negatives in hazard zones when stable terrain samples substantially outnumber landslide events, elevating sensitivity for early warning."
+      },
+      "penalty": {
+        "value": "deprecated",
+        "display_name": "Regularization Norm",
+        "control_type": "Loss Regularization",
+        "type": "string",
+        "meaning": "Norm utilized in penalization (L2 Ridge penalty: sum of squared weight magnitudes).",
+        "purpose": "Distributes feature weights smoothly across correlated terrain, radar, and vegetation bands rather than abruptly dropping features."
+      }
+    },
+    "best_cv_score": 0.7781,
+    "cv_scoring_metric": "roc_auc",
+    "tuning_method": "RandomizedSearchCV (Scikit-Learn Dynamic Parameter Analysis)"
+  },
+  "random_forest": {
+    "model_key": "random_forest",
+    "model_name": "Random Forest",
+    "model_type": "Bagging Ensemble of Decision Trees",
+    "description": "Ensemble of decorrelated decision trees trained via bootstrap aggregation (bagging) with random feature subspace sampling.",
+    "parameters": {
+      "max_depth": {
+        "value": 18,
+        "display_name": "Maximum Tree Depth (max_depth)",
+        "control_type": "Tree Capacity",
+        "type": "integer",
+        "meaning": "Maximum vertical hierarchical branching limit from root to terminal leaf in any tree.",
+        "purpose": "Constrains hierarchical partitioning depth, preventing individual trees from memorizing localized topographical micro-features and acquisition artifacts."
+      },
+      "max_features": {
+        "value": 0.7,
+        "display_name": "Feature Subspace Ratio (max_features)",
+        "control_type": "Feature Decorrelation",
+        "type": "string_or_float",
+        "meaning": "Number or fraction of feature dimensions randomly evaluated when seeking the optimal partition at each split.",
+        "purpose": "Ensures diverse geomorphic, spectral (NDVI/EVI), and radar texture (GLCM) features are explored, preventing slope gradient alone from monopolizing splits."
+      },
+      "min_samples_leaf": {
+        "value": 8,
+        "display_name": "Minimum Leaf Samples (min_samples_leaf)",
+        "control_type": "Leaf Smoothing",
+        "type": "integer",
+        "meaning": "Minimum number of observation samples that must reside in any terminal leaf node.",
+        "purpose": "Enforces spatial consensus smoothing, ensuring hazard predictions are supported by statistically significant contiguous clusters of terrain pixels."
+      },
+      "min_samples_split": {
+        "value": 5,
+        "display_name": "Minimum Split Samples (min_samples_split)",
+        "control_type": "Structural Regularization",
+        "type": "integer",
+        "meaning": "Minimum number of observation samples required to consider splitting an internal tree node.",
+        "purpose": "Prevents spurious bifurcations driven by localized geospatial outliers or radar speckle in Sentinel imagery."
+      },
+      "n_estimators": {
+        "value": 253,
+        "display_name": "Number of Decision Trees (n_estimators)",
+        "control_type": "Ensemble Capacity",
+        "type": "integer",
+        "meaning": "Total count of decorrelated decision trees constructed in the bagging ensemble.",
+        "purpose": "Suppresses overall ensemble variance, producing robust, noise-resilient spatial susceptibility classifications across varied geographic terrain."
+      },
+      "criterion": {
+        "value": "gini",
+        "display_name": "Splitting Impurity Criterion",
+        "control_type": "Partition Quality",
+        "type": "string",
+        "meaning": "Mathematical metric (e.g. Gini Impurity) used to evaluate the information purity gained by a potential split.",
+        "purpose": "Maximizes the separation between stable terrain and high-risk landslide scars at each stage of tree construction."
+      },
+      "class_weight": {
+        "value": "balanced",
+        "display_name": "Class Weighting Scheme",
+        "control_type": "Cost-Sensitive Balancing",
+        "type": "string",
+        "meaning": "Adjusts loss weights inversely proportional to target class distribution across trees.",
+        "purpose": "Prioritizes correct identification of sparse landslide events, reducing dangerous false-negative risk assessments."
+      }
+    },
+    "best_cv_score": 0.9433,
+    "cv_scoring_metric": "roc_auc",
+    "tuning_method": "RandomizedSearchCV (Scikit-Learn Dynamic Parameter Analysis)"
+  },
+  "xgboost": {
+    "model_key": "xgboost",
+    "model_name": "XGBoost Classifier",
+    "model_type": "Gradient Boosted Decision Trees",
+    "description": "Sequential boosting algorithm that trains shallow trees to minimize second-order gradient loss residuals with explicit regularization.",
+    "parameters": {
+      "colsample_bytree": {
+        "value": 0.8997,
+        "display_name": "Feature Subsampling (colsample_bytree)",
+        "control_type": "Feature Regularization",
+        "type": "float",
+        "meaning": "Subsample ratio of feature columns evaluated when constructing each boosting tree.",
+        "purpose": "Prevents high-contrast SAR backscatter features from dominating subtle vegetation and moisture index signatures."
+      },
+      "gamma": {
+        "value": 0.0849,
+        "display_name": "Minimum Split Loss Reduction (\u03b3)",
+        "control_type": "Tree Pruning",
+        "type": "float",
+        "meaning": "Minimum loss reduction required to make a further partition on an existing leaf node.",
+        "purpose": "Prunes marginal tree branches that do not yield significant information gain, keeping the hazard model parsimonious."
+      },
+      "learning_rate": {
+        "value": 0.0418,
+        "display_name": "Shrinkage Rate (\u03b7 / learning_rate)",
+        "control_type": "Optimization Step Size",
+        "type": "float",
+        "meaning": "Scaling factor applied to the leaf weights of each newly constructed tree before updating model state.",
+        "purpose": "Prevents aggressive overshooting of optimal loss parameters, enabling gradual generalization across diverse multi-state topographies."
+      },
+      "max_depth": {
+        "value": 8,
+        "display_name": "Tree Maximum Depth (max_depth)",
+        "control_type": "Interaction Order",
+        "type": "integer",
+        "meaning": "Maximum tree depth, governing the highest order of feature interactions modeled by any individual weak learner.",
+        "purpose": "Constrains complex non-linear interactions (e.g., slope \u00d7 curvature \u00d7 TWI) to realistic geomorphic limits, preventing overfitting."
+      },
+      "min_child_weight": {
+        "value": 1,
+        "display_name": "Minimum Child Weight (min_child_weight)",
+        "control_type": "Hessian Regularization",
+        "type": "integer",
+        "meaning": "Minimum sum of instance second derivatives (hessian weights) required in a child leaf node.",
+        "purpose": "Prevents boosting trees from carving out isolated leaves for small localized DEM anomalies."
+      },
+      "n_estimators": {
+        "value": 403,
+        "display_name": "Boosting Iterations (n_estimators)",
+        "control_type": "Ensemble Capacity",
+        "type": "integer",
+        "meaning": "Number of sequential gradient boosted decision trees fitted to residual errors of previous iterations.",
+        "purpose": "Successively refines subtle non-linear boundaries separating unstable slope regimes from surrounding stable geomorphology."
+      },
+      "scale_pos_weight": {
+        "value": 1.845,
+        "display_name": "Positive Class Multiplier (scale_pos_weight)",
+        "control_type": "Cost-Sensitive Balancing",
+        "type": "float",
+        "meaning": "Multiplier applied to gradient weights for positive class observations (landslide events).",
+        "purpose": "Calibrates the model's sensitivity threshold, heavily penalizing missed landslides to ensure reliable hazard alerts."
+      },
+      "subsample": {
+        "value": 0.8335,
+        "display_name": "Instance Subsampling (subsample)",
+        "control_type": "Stochastic Regularization",
+        "type": "float",
+        "meaning": "Fraction of training samples randomly drawn without replacement to train each sequential boosting round.",
+        "purpose": "Introduces stochastic perturbation to desensitize the model against atmospheric distortion and Sentinel sensor noise."
+      },
+      "objective": {
+        "value": "binary:logistic",
+        "display_name": "Loss Objective",
+        "control_type": "Mathematical Formulation",
+        "type": "string",
+        "meaning": "Loss function to optimize (binary:logistic outputs calibrated class probabilities).",
+        "purpose": "Produces calibrated posterior risk probabilities (0.0 to 1.0) directly interpretable for emergency warning maps."
+      }
+    },
+    "best_cv_score": 0.9495,
+    "cv_scoring_metric": "roc_auc",
+    "tuning_method": "RandomizedSearchCV (Scikit-Learn Dynamic Parameter Analysis)"
+  }
+}
